@@ -1,32 +1,28 @@
 package gofunc
 
-type Interface interface {
-	comparable
-}
-
-type Collection[T Interface] struct {
+type collection[T comparable] struct {
 	data []T
 }
 
-func New[T Interface](arr []T) *Collection[T] {
-	var newArr Collection[T]
+func New[T comparable](arr []T) *collection[T] {
+	var newArr collection[T]
 	newArr.data = make([]T, len(arr))
 	copy(newArr.data, arr)
 
 	return &newArr
 }
 
-func (c *Collection[T]) Map(f func(el T) T) *Collection[T] {
-	newCollection := New[T](c.data)
+func (c *collection[T]) Map(f func(el T) T) *collection[T] {
+	newcollection := New[T](c.data)
 
-	for i := 0; i < len(newCollection.data); i++ {
-		newCollection.data[i] = f(newCollection.data[i])
+	for i := 0; i < len(newcollection.data); i++ {
+		newcollection.data[i] = f(newcollection.data[i])
 	}
 
-	return newCollection
+	return newcollection
 }
 
-func (c *Collection[T]) Reduce(f func(el, accum T) T) T {
+func (c *collection[T]) Reduce(f func(el, accum T) T) T {
 	var accum T
 
 	for i := 0; i < len(c.data); i++ {
@@ -36,19 +32,19 @@ func (c *Collection[T]) Reduce(f func(el, accum T) T) T {
 	return accum
 }
 
-func (c *Collection[T]) Filter(f func(el T) bool) *Collection[T] {
-	newCollection := New[T](make([]T, 0, len(c.data)))
+func (c *collection[T]) Filter(f func(el T) bool) *collection[T] {
+	newcollection := New[T](make([]T, 0, len(c.data)))
 
 	for i := 0; i < len(c.data); i++ {
 		if f(c.data[i]) {
-			newCollection.data = append(newCollection.data, c.data[i])
+			newcollection.data = append(newcollection.data, c.data[i])
 		}
 	}
 
-	return newCollection
+	return newcollection
 }
 
-func (c *Collection[T]) Match(f func(el T) bool) bool {
+func (c *collection[T]) Match(f func(el T) bool) bool {
 	for i := 0; i < len(c.data); i++ {
 		if f(c.data[i]) {
 			return true
@@ -58,7 +54,7 @@ func (c *Collection[T]) Match(f func(el T) bool) bool {
 	return false
 }
 
-func (c *Collection[T]) AllMatch(f func(el T) bool) bool {
+func (c *collection[T]) AllMatch(f func(el T) bool) bool {
 	for i := 0; i < len(c.data); i++ {
 		if !f(c.data[i]) {
 			return false
@@ -68,39 +64,39 @@ func (c *Collection[T]) AllMatch(f func(el T) bool) bool {
 	return true
 }
 
-func (c *Collection[T]) Limit(limit int) *Collection[T] {
+func (c *collection[T]) Limit(limit int) *collection[T] {
 	return New[T](c.data[:limit])
 }
 
-func (c *Collection[T]) Skip(skip int) *Collection[T] {
+func (c *collection[T]) Skip(skip int) *collection[T] {
 	return New[T](c.data[skip:])
 }
 
-func (c *Collection[T]) ForEach(f func(el T)) {
+func (c *collection[T]) ForEach(f func(el T)) {
 	for i := 0; i < len(c.data); i++ {
 		f(c.data[i])
 	}
 }
 
-func (c *Collection[T]) Sort(f func(arr []T)) *Collection[T] {
-	newCollection := New[T](c.data)
+func (c *collection[T]) Sort(f func(arr []T)) *collection[T] {
+	newcollection := New[T](c.data)
 
-	f(newCollection.data)
+	f(newcollection.data)
 
-	return newCollection
+	return newcollection
 }
 
-func (c *Collection[T]) Reverse() *Collection[T] {
-	newCollection := New[T](make([]T, len(c.data)))
+func (c *collection[T]) Reverse() *collection[T] {
+	newcollection := New[T](make([]T, len(c.data)))
 
 	for i := 0; i < len(c.data); i++ {
-		newCollection.data[i] = c.data[len(c.data)-i-1]
+		newcollection.data[i] = c.data[len(c.data)-i-1]
 	}
 
-	return newCollection
+	return newcollection
 }
 
-func (c *Collection[T]) ToString(f func(el T) string) string {
+func (c *collection[T]) ToString(f func(el T) string) string {
 	var resultStr string
 	for i := 0; i < len(c.data); i++ {
 		resultStr += f(c.data[i])
@@ -109,7 +105,7 @@ func (c *Collection[T]) ToString(f func(el T) string) string {
 	return resultStr
 }
 
-func (c *Collection[T]) Max(compareFunc func(firstEl, secondEl T) T) T {
+func (c *collection[T]) Max(compareFunc func(firstEl, secondEl T) T) T {
 	var resultMax, currentMax T
 
 	if len(c.data) > 1 {
@@ -124,7 +120,7 @@ func (c *Collection[T]) Max(compareFunc func(firstEl, secondEl T) T) T {
 	return resultMax
 }
 
-func (c *Collection[T]) Min(compareFunc func(firstEl, secondEl T) T) T {
+func (c *collection[T]) Min(compareFunc func(firstEl, secondEl T) T) T {
 	var resultMin, currentMin T
 
 	if len(c.data) > 1 {
@@ -139,10 +135,10 @@ func (c *Collection[T]) Min(compareFunc func(firstEl, secondEl T) T) T {
 	return resultMin
 }
 
-func (c *Collection[T]) Len() int {
+func (c *collection[T]) Len() int {
 	return len(c.data)
 }
 
-func (c *Collection[T]) ToSlice() []T {
+func (c *collection[T]) ToSlice() []T {
 	return c.data
 }
