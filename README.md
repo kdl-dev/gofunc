@@ -25,6 +25,7 @@ go get github.com/kdl-dev/gofunc
 Gofunc is a free library that allows you to write clean, elegant code for working with arrays of data. With Gofunc, you can process a slice in a functional style, which is very convenient and more readable. Gofunc will save you time, which you can use for more serious stuff in your code.
 </p>
 </div>
+
 ---
 
 <div id="example-section">
@@ -41,6 +42,7 @@ Below you can see user slicing processing without Gofunc and with Gofunc. Algori
 5. print information to the console about each user;
 </p>
 
+---
 
 ### Input data
 ```go
@@ -60,6 +62,8 @@ var Users = []User{
 	{9, "Max", 32}, {10, "Veronika", 4},
 }
 ```
+
+---
 
 ### Without Gofunc
 
@@ -93,6 +97,8 @@ func WithoutGofunc() {
 }
 ```
 
+---
+
 ### With Gofunc
 
 ```go
@@ -116,6 +122,8 @@ func WithGofunc() {
 
 <div id="functions-section">
 
+---
+
 ## Functions
 
 * `New[T comparable](arr []T) *collection[T]`
@@ -131,6 +139,8 @@ func WithGofunc() {
 <div>
 
 <div id="methods-section">
+
+---
 
 ## Methods 
 
@@ -349,3 +359,5 @@ func WithGofunc() {
 <br>
 
 <div>
+
+---
