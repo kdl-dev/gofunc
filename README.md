@@ -28,6 +28,7 @@ Gofunc is a free library that allows you to write clean, elegant code for workin
 ---
 
 <div id="example-section">
+
 ## Example
 
 <p>
