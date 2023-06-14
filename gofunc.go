@@ -96,15 +96,6 @@ func (c *collection[T]) Reverse() *collection[T] {
 	return newcollection
 }
 
-func (c *collection[T]) ToString(f func(el T) string) string {
-	var resultStr string
-	for i := 0; i < len(c.data); i++ {
-		resultStr += f(c.data[i])
-	}
-
-	return resultStr
-}
-
 func (c *collection[T]) Max(compareFunc func(firstEl, secondEl T) T) T {
 	var resultMax, currentMax T
 
@@ -141,4 +132,13 @@ func (c *collection[T]) Len() int {
 
 func (c *collection[T]) ToSlice() []T {
 	return c.data
+}
+
+func (c *collection[T]) ToString(f func(el T) string) string {
+	var resultStr string
+	for i := 0; i < len(c.data); i++ {
+		resultStr += f(c.data[i])
+	}
+
+	return resultStr
 }
