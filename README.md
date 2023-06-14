@@ -219,6 +219,20 @@ func WithGofunc() {
 
 <br>
 
+* `Distinct() *collection[T]`
+<p>
+	Returns a collection consisting of the distinct elements.
+</p>
+
+```go
+{
+	...
+	newCollection := collection.Distinct()
+}
+```
+
+<br>
+
 * `Limit(n int) *collection[T]`
 <p>
 	Returns a collection consisting of the elements of this collection, truncated to be no longer than n in length.
