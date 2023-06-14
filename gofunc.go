@@ -64,6 +64,20 @@ func (c *collection[T]) AllMatch(predicate func(el T) bool) bool {
 	return true
 }
 
+func (c *collection[T]) Distinct() *collection[T] {
+	newcollection := New[T](make([]T, 0, len(c.data)))
+	unique := make(map[T]bool)
+
+	for _, value := range c.data {
+		if _, isExists := unique[value]; !isExists {
+			unique[value] = true
+			newcollection.data = append(newcollection.data, value)
+		}
+	}
+
+	return newcollection
+}
+
 func (c *collection[T]) Limit(n int) *collection[T] {
 	if n > c.Len() {
 		n = c.Len()

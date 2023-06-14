@@ -13,8 +13,10 @@ import (
 
 // ! don't edit
 var (
-	intSlice = []int{3, 1, 6, 9, -5, 0, 11}
-	strSlice = []string{"test2", "test1", "test4", "test3"}
+	intSlice  = []int{3, 1, 6, 9, -5, 0, 11}
+	strSlice  = []string{"test2", "test1", "test4", "test3"}
+	intSlice2 = []int{3, 1, 6, 9, -5, 0, 11, 1, 1, 5, 9, 14, 3, -5, 0}
+	strSlice2 = []string{"test2", "test1", "test4", "test3", "test2", "test5", "test1"}
 )
 
 type TestNewStruct[T comparable] struct {
@@ -207,6 +209,39 @@ func TestAllMatch(t *testing.T) {
 			collection := gofunc.New(slice)
 			result := collection.AllMatch(func(el string) bool { return strings.Contains(el, "test") })
 			require.Equal(t, test.expected, result)
+		}
+	}
+}
+
+func TestDistinct(t *testing.T) {
+	tests := []TestNewStruct[interface{}]{
+		{
+			description: "test distinct for collection of ints",
+			input:       intSlice2,
+			expected:    []int{3, 1, 6, 9, -5, 0, 11, 5, 14},
+		},
+		{
+			description: "test distinct for collection of strings",
+			input:       strSlice2,
+			expected:    []string{"test2", "test1", "test4", "test3", "test5"},
+		},
+	}
+
+	for _, test := range tests {
+		t.Logf("Start: %s\n", test.description)
+		switch test.input.(type) {
+		case []int:
+			slice := test.input.([]int)
+			collection := gofunc.New(slice)
+			newCollection := collection.Distinct()
+			require.Equal(t, test.expected, newCollection.ToSlice())
+			require.NotEqual(t, test.expected, collection.ToSlice())
+		case []string:
+			slice := test.input.([]string)
+			collection := gofunc.New(slice)
+			newCollection := collection.Distinct()
+			require.Equal(t, test.expected, newCollection.ToSlice())
+			require.NotEqual(t, test.expected, collection.ToSlice())
 		}
 	}
 }
