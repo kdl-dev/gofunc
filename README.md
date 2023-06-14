@@ -1,4 +1,4 @@
-# Gofunc
+![image](img/gopher.png)
 
 ![Go Version](https://img.shields.io/badge/go%20version-1.20.4-61CFDD.svg?style=flat-square)
 
@@ -24,7 +24,7 @@ go get github.com/kdl-dev/gofunc
 <p>
 Gofunc is a free library that allows you to write clean, elegant code for working with arrays of data. With Gofunc, you can process a slice in a functional style, which is very convenient and more readable. Gofunc will save you time, which you can use for more serious stuff in your code.
 </p>
-</div>
+</div>Age
 
 ---
 
@@ -115,14 +115,15 @@ func WithGofunc() {
 ---
 <p>As you can see, the code looks shorter and prettier in the second variant.</p>
 
-<p>You can play with the code in goplay space: <a>https://goplay.space/#P1mrWp7ZePV .</a></p>
+<p>You can play with the code in goplay space: 
+<a href="https://goplay.space/#P1mrWp7ZePV">gofunc example</a>.</p>
 
 <div>
+
 ---
 
 <div id="functions-section">
 
----
 
 ## Functions
 
