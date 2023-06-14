@@ -12,41 +12,41 @@ func New[T comparable](arr []T) *collection[T] {
 	return &newArr
 }
 
-func (c *collection[T]) Map(f func(el T) T) *collection[T] {
+func (c *collection[T]) Map(predicate func(el T) T) *collection[T] {
 	newcollection := New[T](c.data)
 
 	for i := 0; i < len(newcollection.data); i++ {
-		newcollection.data[i] = f(newcollection.data[i])
+		newcollection.data[i] = predicate(newcollection.data[i])
 	}
 
 	return newcollection
 }
 
-func (c *collection[T]) Reduce(f func(el, accum T) T) T {
+func (c *collection[T]) Reduce(binaryOperator func(el, accum T) T) T {
 	var accum T
 
-	for i := 0; i < len(c.data); i++ {
-		accum = f(c.data[i], accum)
+	for _, value := range c.data {
+		accum = binaryOperator(value, accum)
 	}
 
 	return accum
 }
 
-func (c *collection[T]) Filter(f func(el T) bool) *collection[T] {
+func (c *collection[T]) Filter(filter func(el T) bool) *collection[T] {
 	newcollection := New[T](make([]T, 0, len(c.data)))
 
-	for i := 0; i < len(c.data); i++ {
-		if f(c.data[i]) {
-			newcollection.data = append(newcollection.data, c.data[i])
+	for _, value := range c.data {
+		if filter(value) {
+			newcollection.data = append(newcollection.data, value)
 		}
 	}
 
 	return newcollection
 }
 
-func (c *collection[T]) Match(f func(el T) bool) bool {
-	for i := 0; i < len(c.data); i++ {
-		if f(c.data[i]) {
+func (c *collection[T]) Match(predicate func(el T) bool) bool {
+	for _, value := range c.data {
+		if predicate(value) {
 			return true
 		}
 	}
@@ -54,9 +54,9 @@ func (c *collection[T]) Match(f func(el T) bool) bool {
 	return false
 }
 
-func (c *collection[T]) AllMatch(f func(el T) bool) bool {
-	for i := 0; i < len(c.data); i++ {
-		if !f(c.data[i]) {
+func (c *collection[T]) AllMatch(predicate func(el T) bool) bool {
+	for _, value := range c.data {
+		if !predicate(value) {
 			return false
 		}
 	}
@@ -84,16 +84,16 @@ func (c *collection[T]) Skip(n int) *collection[T] {
 	return New[T](c.data[n:])
 }
 
-func (c *collection[T]) ForEach(f func(el T)) {
-	for i := 0; i < len(c.data); i++ {
-		f(c.data[i])
+func (c *collection[T]) ForEach(consume func(el T)) {
+	for _, value := range c.data {
+		consume(value)
 	}
 }
 
-func (c *collection[T]) Sort(f func(arr []T)) *collection[T] {
+func (c *collection[T]) Sort(sort func(arr []T)) *collection[T] {
 	newcollection := New[T](c.data)
 
-	f(newcollection.data)
+	sort(newcollection.data)
 
 	return newcollection
 }
@@ -101,38 +101,38 @@ func (c *collection[T]) Sort(f func(arr []T)) *collection[T] {
 func (c *collection[T]) Reverse() *collection[T] {
 	newcollection := New[T](make([]T, len(c.data)))
 
-	for i := 0; i < len(c.data); i++ {
+	for i := 0; i < len(newcollection.data); i++ {
 		newcollection.data[i] = c.data[len(c.data)-i-1]
 	}
 
 	return newcollection
 }
 
-func (c *collection[T]) Max(compareFunc func(firstEl, secondEl T) T) T {
+func (c *collection[T]) Max(compare func(firstEl, secondEl T) T) T {
 	var resultMax, currentMax T
 
 	if len(c.data) > 1 {
-		resultMax = compareFunc(c.data[0], c.data[1])
+		resultMax = compare(c.data[0], c.data[1])
 	}
 
 	for i := 1; i < len(c.data)-1; i++ {
-		currentMax = compareFunc(c.data[i], c.data[i+1])
-		resultMax = compareFunc(resultMax, currentMax)
+		currentMax = compare(c.data[i], c.data[i+1])
+		resultMax = compare(resultMax, currentMax)
 	}
 
 	return resultMax
 }
 
-func (c *collection[T]) Min(compareFunc func(firstEl, secondEl T) T) T {
+func (c *collection[T]) Min(compare func(firstEl, secondEl T) T) T {
 	var resultMin, currentMin T
 
 	if len(c.data) > 1 {
-		resultMin = compareFunc(c.data[0], c.data[1])
+		resultMin = compare(c.data[0], c.data[1])
 	}
 
 	for i := 1; i < len(c.data)-1; i++ {
-		currentMin = compareFunc(c.data[i], c.data[i+1])
-		resultMin = compareFunc(resultMin, currentMin)
+		currentMin = compare(c.data[i], c.data[i+1])
+		resultMin = compare(resultMin, currentMin)
 	}
 
 	return resultMin
@@ -146,10 +146,10 @@ func (c *collection[T]) ToSlice() []T {
 	return c.data
 }
 
-func (c *collection[T]) ToString(f func(el T) string) string {
+func (c *collection[T]) ToString(convert func(el T) string) string {
 	var resultStr string
-	for i := 0; i < len(c.data); i++ {
-		resultStr += f(c.data[i])
+	for _, value := range c.data {
+		resultStr += convert(value)
 	}
 
 	return resultStr
