@@ -64,24 +64,24 @@ func (c *collection[T]) AllMatch(f func(el T) bool) bool {
 	return true
 }
 
-func (c *collection[T]) Limit(limit int) *collection[T] {
-	if limit > c.Len() {
-		limit = c.Len()
-	} else if limit < 0 {
-		limit = 0
+func (c *collection[T]) Limit(n int) *collection[T] {
+	if n > c.Len() {
+		n = c.Len()
+	} else if n < 0 {
+		n = 0
 	}
 
-	return New[T](c.data[:limit])
+	return New[T](c.data[:n])
 }
 
-func (c *collection[T]) Skip(skip int) *collection[T] {
-	if skip > c.Len() {
-		skip = c.Len()
-	} else if skip < 0 {
-		skip = 0
+func (c *collection[T]) Skip(n int) *collection[T] {
+	if n > c.Len() {
+		n = c.Len()
+	} else if n < 0 {
+		n = 0
 	}
 
-	return New[T](c.data[skip:])
+	return New[T](c.data[n:])
 }
 
 func (c *collection[T]) ForEach(f func(el T)) {
