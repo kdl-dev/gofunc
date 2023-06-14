@@ -65,10 +65,22 @@ func (c *collection[T]) AllMatch(f func(el T) bool) bool {
 }
 
 func (c *collection[T]) Limit(limit int) *collection[T] {
+	if limit > c.Len() {
+		limit = c.Len()
+	} else if limit < 0 {
+		limit = 0
+	}
+
 	return New[T](c.data[:limit])
 }
 
 func (c *collection[T]) Skip(skip int) *collection[T] {
+	if skip > c.Len() {
+		skip = c.Len()
+	} else if skip < 0 {
+		skip = 0
+	}
+
 	return New[T](c.data[skip:])
 }
 

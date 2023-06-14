@@ -234,6 +234,9 @@ func TestLimit(t *testing.T) {
 			newCollection := collection.Limit(3)
 			require.Equal(t, test.expected, newCollection.ToSlice())
 			require.NotEqual(t, test.expected, collection.ToSlice())
+
+			collection.Limit(collection.Len() + 10)
+			collection.Limit(-1)
 		case []string:
 			slice := test.input.([]string)
 			collection := gofunc.New(slice)
@@ -267,6 +270,9 @@ func TestSkip(t *testing.T) {
 			newCollection := collection.Skip(3)
 			require.Equal(t, test.expected, newCollection.ToSlice())
 			require.NotEqual(t, test.expected, collection.ToSlice())
+
+			collection.Skip(collection.Len() + 10)
+			collection.Skip(-1)
 		case []string:
 			slice := test.input.([]string)
 			collection := gofunc.New(slice)
