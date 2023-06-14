@@ -24,7 +24,7 @@ go get github.com/kdl-dev/gofunc
 <p>
 Gofunc is a free library that allows you to write clean, elegant code for working with arrays of data. With Gofunc, you can process a slice in a functional style, which is very convenient and more readable. Gofunc will save you time, which you can use for more serious stuff in your code.
 </p>
-</div>Age
+</div>
 
 ---
 
