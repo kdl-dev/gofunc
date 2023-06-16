@@ -2,7 +2,7 @@
 
 ![Go Version](https://img.shields.io/badge/go%20version-1.16-61CFDD.svg?style=flat-square)
 
-<div id="content-section>
+<div id="content-section">
 
 # Content
 1. [Install](#install-section)
