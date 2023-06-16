@@ -1,6 +1,6 @@
 ![image](img/gopher.png)
 
-![Go Version](https://img.shields.io/badge/go%20version-1.16-61CFDD.svg?style=flat-square)
+![Go Version](https://img.shields.io/badge/go%20version-1.18-61CFDD.svg?style=flat-square)
 
 <div id="content-section">
 
