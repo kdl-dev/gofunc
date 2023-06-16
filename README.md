@@ -4,6 +4,8 @@
 
 <div id="content-section">
 
+---
+
 # Content
 1. [Install](#install-section)
 2. [What is Gofunc ?](#whatis-section)
@@ -12,6 +14,8 @@
 5. [Methods](#methods-section)
 
 <div>
+
+---
 
 <div id="install-section">
 
@@ -22,10 +26,12 @@ go get github.com/kdl-dev/gofunc
 ```
 </div> 
 
+---
+
 <div id="whatis-section">
 
 ## What is Gofunc ?
----
+
 <p>
 Gofunc is a free library that allows you to write clean, elegant code for working with arrays of data. With Gofunc, you can process a slice in a functional style, which is very convenient and more readable. Gofunc will save you time, which you can use for more serious stuff in your code.
 </p>
