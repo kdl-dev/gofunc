@@ -1,6 +1,8 @@
 ![image](img/gopher.png)
 
-![Go Version](https://img.shields.io/badge/go%20version-1.20.4-61CFDD.svg?style=flat-square)
+![Go Version](https://img.shields.io/badge/go%20version-1.16-61CFDD.svg?style=flat-square)
+
+<div id="content-section>
 
 # Content
 1. [Install](#install-section)
@@ -9,13 +11,16 @@
 4. [Functions](#functions-section)
 5. [Methods](#methods-section)
 
+<div>
+
 <div id="install-section">
 
-## Install
+## Install 
+
 ```shell 
 go get github.com/kdl-dev/gofunc
 ```
-</div>
+</div> 
 
 <div id="whatis-section">
 
@@ -134,6 +139,7 @@ func WithGofunc() {
 
 ```go
 {
+	slice := []int{1, 2, 3, 4, 5}
 	collection := gofunc.New(slice)
 }
 ```
@@ -149,6 +155,22 @@ func WithGofunc() {
 
 <br>
 
+* `ForEach(f func(el T))`
+<p>
+	Performs an action for each element of this collection.
+</p>
+
+```go
+{
+	slice := []int{1, 2, 3, 4, 5}
+	collection := gofunc.New(slice)
+	collection.
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 1, 2, 3, 4, 5,
+}
+```
+
+<br>
+
 * `Map(f func(el T) T) *collection[T]`
 <p>
 	Returns a collection consisting of the results of applying the given function to the elements of this collection.
@@ -156,8 +178,11 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	newCollection := collection.Map(func(el int) int { return el++ })
+	slice := []int{1, 2, 3, 4, 5}
+	collection := gofunc.New(slice)
+	collection.
+		Map(func(el int) int { return el * el }).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 1, 4, 9, 16, 25,
 }
 ```
 
@@ -170,8 +195,12 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	result := collection.Reduce(func(el, accum int) int { return el * accum})
+	slice := []int{1, 2, 3, 4, 5}
+	collection := gofunc.New(slice)
+	sum := collection.
+		Reduce(func(el, accum int) int { return el + accum })
+
+	fmt.Println(sum) // 15
 }
 ```
 
@@ -184,8 +213,11 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	newCollection := collection.Filter(func(el int) bool { return el % 2 == 0})
+	slice := []int{1, 2, 3, 4, 5}
+	collection := gofunc.New(slice)
+	collection.
+		Filter(func(el int) bool { return el%2 != 0 }).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 1, 3, 5,
 }
 ```
 
@@ -198,8 +230,12 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	result := collection.Match(func(el int) bool { return el < 0})
+	slice := []int{1, 2, 3, 4, 5}
+	collection := gofunc.New(slice)
+	isMatched := collection.
+		Match(func(el int) bool { return el < 0 })
+
+	fmt.Println(isMatched) // false
 }
 ```
 
@@ -212,8 +248,12 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	result := collection.AllMatch(func(el int) bool { return el < 0})
+	slice := []int{1, 2, 3, 4, 5}
+	collection := gofunc.New(slice)
+	isAllMatched := collection.
+		AllMatch(func(el int) bool { return el > 0 })
+
+	fmt.Println(isAllMatched) // true
 }
 ```
 
@@ -226,8 +266,11 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	newCollection := collection.Distinct()
+	slice := []int{1, 2, 1, 4, 2, -2, 10, 1}
+	collection := gofunc.New(slice)
+	collection.
+		Distinct().
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 1, 2, 4, -2, 10,
 }
 ```
 
@@ -240,8 +283,11 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	newCollection := collection.Limit(5)
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	collection := gofunc.New(slice)
+	collection.
+		Limit(6).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 1, 2, 3, 4, 5, 6,
 }
 ```
 
@@ -254,22 +300,11 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	newCollection := collection.Limit(5)
-}
-```
-
-<br>
-
-* `ForEach(f func(el T))`
-<p>
-	Performs an action for each element of this collection.
-</p>
-
-```go
-{
-	...
-	collection.ForEach(func(el int) { fmt.Printf("%+v\n", el) })
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	collection := gofunc.New(slice)
+	collection.
+		Skip(6).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 7, 8, 9, 
 }
 ```
 
@@ -282,8 +317,11 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	newCollection := collection.Sort(func(arr []int) { sort.Ints(arr)})
+	slice := []int{0, -5, -7, 1, 3, 2, 11, 8, 4}
+	collection := gofunc.New(slice)
+	collection.
+		Sort(func(arr []int) { sort.Ints(arr) }).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // -7, -5, 0, 1, 2, 3, 4, 8, 11,
 }
 ```
 
@@ -296,8 +334,11 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	newCollection := collection.Sort(func(arr []int) { sort.Ints(arr)})
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	collection := gofunc.New(slice)
+	collection.
+		Reverse().
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 9, 8, 7, 6, 5, 4, 3, 2, 1,
 }
 ```
 
@@ -310,8 +351,14 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	max := collection.Max(func(firstEl, secondEl int) int { return int(math.Max(float64(firstEl), float64(secondEl))) })
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	collection := gofunc.New(slice)
+	max := collection.
+		Max(func(firstEl, secondEl int) int {
+			return int(math.Max(float64(firstEl), float64(secondEl)))
+		})
+
+	fmt.Println(max) // 9
 }
 ```
 
@@ -324,8 +371,14 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	min := collection.Min(func(firstEl, secondEl int) int { return int(math.Min(float64(firstEl), float64(secondEl))) })
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	collection := gofunc.New(slice)
+	min := collection.
+		Min(func(firstEl, secondEl int) int {
+			return int(math.Min(float64(firstEl), float64(secondEl)))
+		})
+
+	fmt.Println(min) // 1
 }
 ```
 
@@ -338,8 +391,10 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	len := collection.Len()
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	collection := gofunc.New(slice)
+
+	fmt.Println(collection.Len()) // 10
 }
 ```
 
@@ -352,8 +407,15 @@ func WithGofunc() {
 
 ```go
 {
-	...
-	slice := collection.ToSlice()
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	collection := gofunc.New(slice)
+
+	newSlice := collection.
+		Map(func(el int) int { return el * 3 }).
+		Filter(func(el int) bool { return el%2 == 0 }).
+		ToSlice()
+
+	fmt.Printf("%T: %v", newSlice, newSlice) // []int: [6 12 18 24 30]
 }
 ```
 
@@ -361,13 +423,20 @@ func WithGofunc() {
 
 * `ToString(f func(el T) string) string`
 <p>
-	Converts a collection to a slice of elements.
+	Converts a collection to a string.
 </p>
 
 ```go
 {
-	...
-	strSlice := collection.ToString(func(el int) string { return strconv.Itoa(el) + " "})
+	slice := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+	collection := gofunc.New(slice)
+
+	newSlice := collection.
+		Map(func(el int) int { return el * 3 }).
+		Filter(func(el int) bool { return el%2 == 0 }).
+		ToString(func(el int) string { return strconv.Itoa(el) + " " })
+
+	fmt.Printf("%T: %v", newSlice, newSlice) // string: 6 12 18 24 30
 }
 ```
 
@@ -376,3 +445,5 @@ func WithGofunc() {
 <div>
 
 ---
+
+[Back to content](#content-section)
