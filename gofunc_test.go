@@ -19,14 +19,14 @@ var (
 	strSlice2 = []string{"test2", "test1", "test4", "test3", "test2", "test5", "test1"}
 )
 
-type TestNewStruct[T comparable] struct {
+type Test[T comparable] struct {
 	description string
 	input       T
 	expected    interface{}
 }
 
 func TestNew(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test init collection of ints",
 			input:       intSlice,
@@ -55,7 +55,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestMap(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test map for collection of ints",
 			input:       intSlice,
@@ -88,7 +88,7 @@ func TestMap(t *testing.T) {
 }
 
 func TestReduce(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test reduce for collection of ints",
 			input:       intSlice,
@@ -119,7 +119,7 @@ func TestReduce(t *testing.T) {
 }
 
 func TestFilter(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test filter for collection of ints",
 			input:       intSlice,
@@ -152,7 +152,7 @@ func TestFilter(t *testing.T) {
 }
 
 func TestMatch(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test match for collection of ints",
 			input:       intSlice,
@@ -183,7 +183,7 @@ func TestMatch(t *testing.T) {
 }
 
 func TestAllMatch(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test all match for collection of ints",
 			input:       intSlice,
@@ -214,7 +214,7 @@ func TestAllMatch(t *testing.T) {
 }
 
 func TestDistinct(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test distinct for collection of ints",
 			input:       intSlice2,
@@ -247,7 +247,7 @@ func TestDistinct(t *testing.T) {
 }
 
 func TestLimit(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test limit for collection of ints",
 			input:       intSlice,
@@ -283,7 +283,7 @@ func TestLimit(t *testing.T) {
 }
 
 func TestSkip(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test skip for collection of ints",
 			input:       intSlice,
@@ -319,7 +319,7 @@ func TestSkip(t *testing.T) {
 }
 
 func TestSort(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test sort for collection of ints",
 			input:       intSlice,
@@ -352,7 +352,7 @@ func TestSort(t *testing.T) {
 }
 
 func TestReverse(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test reverse for collection of ints",
 			input:       intSlice,
@@ -385,7 +385,7 @@ func TestReverse(t *testing.T) {
 }
 
 func TestMax(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test max for collection of ints",
 			input:       intSlice,
@@ -422,7 +422,7 @@ func TestMax(t *testing.T) {
 }
 
 func TestMin(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test min for collection of ints",
 			input:       intSlice,
@@ -459,7 +459,7 @@ func TestMin(t *testing.T) {
 }
 
 func TestLen(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test len for collection of ints",
 			input:       intSlice,
@@ -490,7 +490,7 @@ func TestLen(t *testing.T) {
 }
 
 func TestToSlice(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test conversion to slice of ints for collection of ints",
 			input:       intSlice,
@@ -521,7 +521,7 @@ func TestToSlice(t *testing.T) {
 }
 
 func TestToString(t *testing.T) {
-	tests := []TestNewStruct[interface{}]{
+	tests := []Test[interface{}]{
 		{
 			description: "test conversion to string for collection of ints",
 			input:       intSlice,
