@@ -1,26 +1,26 @@
+<div>
+
 ![image](img/gopher.png)
 
 ![Go Version](https://img.shields.io/badge/go%20version-1.18-61CFDD.svg?style=flat-square)
 
+---
 <div id="content-section">
 
----
-
 # Content
+
 1. [Install](#install-section)
 2. [What is Gofunc ?](#whatis-section)
 3. [Example](#example-section)
-4. [Functions](#functions-section)
-5. [Methods](#methods-section)
-
+4. [Gofunc](#gofunc-section)
+5. [Convert](#convert-section)
 <div>
 
 ---
 
 <div id="install-section">
 
-## Install 
-
+## Install
 ```shell 
 go get github.com/kdl-dev/gofunc
 ```
@@ -35,6 +35,7 @@ go get github.com/kdl-dev/gofunc
 <p>
 Gofunc is a free library that allows you to write clean, elegant code for working with arrays of data. With Gofunc, you can process a slice in a functional style, which is very convenient and more readable. Gofunc will save you time, which you can use for more serious stuff in your code.
 </p>
+
 </div>
 
 ---
@@ -133,8 +134,15 @@ func WithGofunc() {
 
 ---
 
-<div id="functions-section">
+<div id="gofunc-section">
 
+## Gofunc
+1. [Functions](#functions-section)
+2. [Methods](#methods-section)
+
+---
+
+<div id="functions-section">
 
 ## Functions
 
@@ -449,7 +457,51 @@ func WithGofunc() {
 <br>
 
 <div>
+</div>
+
+---
+
+<div id="convert-section">
+
+## Convert
+1. [Functions](#functions-section2)
+
+---
+
+<div id="functions-section2">
+
+## Functions
+
+* `New[T, V comparable](slice []T, convertFunc func(el T) V) []V`
+<p>
+	Converts a slice of type T to a slice of type V.
+</p>
+
+```go
+{
+	slice := []int{1, 2, 3, 4, 5}
+
+	strSlice := convert.New(slice, convert.IntToString[int])
+
+	fmt.Printf("%T %v\n", strSlice, strSlice) // []string [1 2 3 4 5]
+}
+```
+
+<br>
+
+---
+
+<p>There is a set of ready-made functions for converting:</p>
+
+* `IntToString[T ints | uints](el T) string`
+* `FloatToString[T floats](el T) string`
+* `BoolToString(el bool) string`
+* `RuneToString(el rune) string`
+* `ComplexToString[T complex](el T) string`
+
+</div>
 
 ---
 
 [Back to content](#content-section)
+</div>
