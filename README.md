@@ -146,6 +146,12 @@ func WithGofunc() {
 
 ## Functions
 
+1. [New](#Gofunc-New-function-section)
+
+---
+
+<div id="Gofunc-New-function-section">
+
 * `New[T comparable](arr []T) *collection[T]`
 <p>	
 	Returns a collection (collection is a wrapper over a slice).
@@ -157,7 +163,8 @@ func WithGofunc() {
 	collection := gofunc.New(slice)
 }
 ```
-<div>
+</div>
+</div>
 
 <div id="methods-section">
 
@@ -165,9 +172,26 @@ func WithGofunc() {
 
 ## Methods 
 
-`(c *collection[T])`
+1. [ForEach](#ForEach-method-section)
+2. [Map](#Map-method-section)
+3. [Reduce](#Reduce-method-section)
+4. [Filter](#Filter-method-section)
+5. [Match](#Match-method-section)
+6. [AllMatch](#AllMatch-method-section)
+7. [Distinct](#Distinct-method-section)
+8. [Limit](#Limit-method-section)
+9. [Skip](#Skip-method-section)
+10. [Sort](#Sort-method-section)
+11. [Reverse](#Reverse-method-section)
+12. [Max](#Max-method-section)
+13. [Min](#Min-method-section)
+14. [Len](#Len-method-section)
+15. [ToSlice](#ToSlice-method-section)
+16. [ToString](#ToString-method-section)
 
-<br>
+---
+
+<div id="ForEach-method-section">
 
 * `ForEach(f func(el T))`
 <p>
@@ -183,7 +207,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Map-method-section">
 
 * `Map(f func(el T) T) *collection[T]`
 <p>
@@ -200,7 +228,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Reduce-method-section">
 
 * `Reduce(f func(el, accum T) T) T`
 <p>
@@ -218,7 +250,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Filter-method-section">
 
 * `Filter(f func(el T) bool) *collection[T]`
 <p>
@@ -235,7 +271,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Match-method-section">
 
 * `Match(f func(el T) bool) bool`
 <p>
@@ -253,7 +293,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="AllMatch-method-section">
 
 * `AllMatch(f func(el T) bool) bool`
 <p>
@@ -271,7 +315,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Distinct-method-section">
 
 * `Distinct() *collection[T]`
 <p>
@@ -288,7 +336,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Limit-method-section">
 
 * `Limit(n int) *collection[T]`
 <p>
@@ -305,7 +357,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Skip-method-section">
 
 * `Skip(n int) *collection[T]`
 <p>
@@ -322,7 +378,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Sort-method-section">
 
 * `Sort(f func(arr []T)) *collection[T]`
 <p>
@@ -339,7 +399,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Reverse-method-section">
 
 * `Reverse() *collection[T]`
 <p>
@@ -356,7 +420,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Max-method-section">
 
 * `Max(compareFunc func(firstEl, secondEl T) T) T`
 <p>
@@ -376,7 +444,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Min-method-section">
 
 * `Min(compareFunc func(firstEl, secondEl T) T) T`
 <p>
@@ -396,7 +468,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="Len-method-section">
 
 * `Len() int`
 <p>
@@ -412,7 +488,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="ToSlice-method-section">
 
 * `ToSlice() []T`
 <p>
@@ -433,7 +513,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
+
+<div id="ToString-method-section">
 
 * `ToString(f func(el T) string) string`
 <p>
@@ -454,9 +538,11 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
 
-<div>
+</div>
 </div>
 
 ---
@@ -471,6 +557,13 @@ func WithGofunc() {
 <div id="functions-section2">
 
 ## Functions
+
+1. [New](#Convert-New-function-section)
+2. [Helpers for New](#Helpers-for-Convert-New-function-section)
+
+---
+
+<div id="Convert-New-function-section">
 
 * `New[T, V comparable](slice []T, convertFunc func(el T) V) []V`
 <p>
@@ -487,9 +580,13 @@ func WithGofunc() {
 }
 ```
 
+</div>
+
 <br>
 
 ---
+
+<div id="Helpers-for-Convert-New-function-section">
 
 <p>There is a set of ready-made functions for converting:</p>
 
@@ -498,6 +595,8 @@ func WithGofunc() {
 * `BoolToString(el bool) string`
 * `RuneToString(el rune) string`
 * `ComplexToString[T complex](el T) string`
+
+</div>
 
 </div>
 
