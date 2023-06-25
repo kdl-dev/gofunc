@@ -147,6 +147,7 @@ func WithGofunc() {
 ## Functions
 
 1. [New](#Gofunc-New-function-section)
+2. [Generate](#Gofunc-Generate-function-section)
 
 ---
 
@@ -164,6 +165,27 @@ func WithGofunc() {
 }
 ```
 </div>
+
+</br>
+
+<div id="Gofunc-Generate-function-section">
+
+* `Generate[T comparable](script func() T, limit int) *collection[T]`
+<p>	
+	Generates a collection based on the received function. The number of elements is given by the second input argument.
+</p>
+
+```go
+{
+	i := 0
+	collection := gofunc.Generate(func() int { i++; return i }, 10)
+	collection.ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+}
+```
+</div>
+
+</br>
+
 </div>
 
 <div id="methods-section">
@@ -174,20 +196,23 @@ func WithGofunc() {
 
 1. [ForEach](#ForEach-method-section)
 2. [Map](#Map-method-section)
-3. [Reduce](#Reduce-method-section)
-4. [Filter](#Filter-method-section)
-5. [Match](#Match-method-section)
-6. [AllMatch](#AllMatch-method-section)
-7. [Distinct](#Distinct-method-section)
-8. [Limit](#Limit-method-section)
-9. [Skip](#Skip-method-section)
-10. [Sort](#Sort-method-section)
-11. [Reverse](#Reverse-method-section)
-12. [Max](#Max-method-section)
-13. [Min](#Min-method-section)
-14. [Len](#Len-method-section)
-15. [ToSlice](#ToSlice-method-section)
-16. [ToString](#ToString-method-section)
+3. [FlatMap](#FlatMap-method-section)
+4. [Reduce](#Reduce-method-section)
+5. [Filter](#Filter-method-section)
+6. [Match](#Match-method-section)
+7. [AllMatch](#AllMatch-method-section)
+8. [Distinct](#Distinct-method-section)
+9. [Limit](#Limit-method-section)
+10. [Skip](#Skip-method-section)
+11. [Sort](#Sort-method-section)
+12. [Reverse](#Reverse-method-section)
+13. [Replace](#Replace-method-section)
+14. [ReplaceAll](#ReplaceAll-method-section)
+15. [Max](#Max-method-section)
+16. [Min](#Min-method-section)
+17. [Len](#Len-method-section)
+18. [ToSlice](#ToSlice-method-section)
+19. [ToString](#ToString-method-section)
 
 ---
 
@@ -231,6 +256,27 @@ func WithGofunc() {
 </div>
 
 <br>
+
+<div id="FlatMap-method-section">
+
+* `FlatMap(predicate func(el T) (T, T)) *collection[T]`
+<p>
+	Returns a collection consisting of the results of replacing each element of this collection with the contents of a mapped collection produced by applying the provided mapping function to each element.
+</p>
+
+```go
+{
+	slice := []int{1, 2, 3, 4, 5}
+	collection := gofunc.New(slice)
+	collection.
+		FlatMap(func(el int) (int, int) { return el, el + 1 }).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 1, 2, 2, 3, 3, 4, 4, 5, 5, 6,
+}
+```
+
+</div>
+
+</br>
 
 <div id="Reduce-method-section">
 
@@ -417,6 +463,48 @@ func WithGofunc() {
 	collection.
 		Reverse().
 		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 9, 8, 7, 6, 5, 4, 3, 2, 1,
+}
+```
+
+</div>
+
+<br>
+
+<div id="Replace-method-section">
+
+* `Replace(targets []T, replacement T) *collection[T]`
+<p>
+	Replaces all the first matching elements of the collection passed to targets with the element passed to replacement.
+</p>
+
+```go
+{
+	slice := []int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6}
+	collection := gofunc.New(slice)
+	collection.
+		Replace([]int{1, 3, 5}, 10).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 10, 2, 10, 4, 10, 1, 2, 3, 4, 5, 6, 
+}
+```
+
+</div>
+
+<br>
+
+<div id="ReplaceAll-method-section">
+
+* `ReplaceAll(targets []T, replacement T) *collection[T]`
+<p>
+	Replaces all elements of the collection passed to the target objects with the element passed to replace.
+</p>
+
+```go
+{
+	slice := []int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5, 6}
+	collection := gofunc.New(slice)
+	collection.
+		Replace([]int{1, 3, 5}, 10).
+		ForEach(func(el int) { fmt.Printf("%d, ", el) }) // 10, 2, 10, 4, 10, 10, 2, 10, 4, 10, 6,
 }
 ```
 
