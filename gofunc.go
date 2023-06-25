@@ -5,11 +5,25 @@ type collection[T comparable] struct {
 }
 
 func New[T comparable](arr []T) *collection[T] {
-	var newArr collection[T]
-	newArr.data = make([]T, len(arr))
-	copy(newArr.data, arr)
+	var newCollection collection[T]
+	newCollection.data = make([]T, len(arr))
+	copy(newCollection.data, arr)
 
-	return &newArr
+	return &newCollection
+}
+
+func Generate[T comparable](script func() T, limit int) *collection[T] {
+	if limit <= 0 {
+		return New(make([]T, 0))
+	}
+
+	newCollection := New(make([]T, limit))
+
+	for i := 0; i < limit; i++ {
+		newCollection.data[i] = script()
+	}
+
+	return newCollection
 }
 
 func (c *collection[T]) Map(predicate func(el T) T) *collection[T] {
@@ -17,6 +31,16 @@ func (c *collection[T]) Map(predicate func(el T) T) *collection[T] {
 
 	for i := 0; i < len(newcollection.data); i++ {
 		newcollection.data[i] = predicate(newcollection.data[i])
+	}
+
+	return newcollection
+}
+
+func (c *collection[T]) FlatMap(predicate func(el T) (T, T)) *collection[T] {
+	newcollection := New[T](make([]T, len(c.data)*2))
+
+	for i := 0; i < len(newcollection.data)-1; i += 2 {
+		newcollection.data[i], newcollection.data[i+1] = predicate(c.data[i/2])
 	}
 
 	return newcollection
@@ -117,6 +141,44 @@ func (c *collection[T]) Reverse() *collection[T] {
 
 	for i := 0; i < len(newcollection.data); i++ {
 		newcollection.data[i] = c.data[len(c.data)-i-1]
+	}
+
+	return newcollection
+}
+
+func (c *collection[T]) Replace(targets []T, replacement T) *collection[T] {
+	newcollection := New[T](c.data)
+
+Exit:
+	for i := 0; i < len(newcollection.data); i++ {
+		for j := 0; j < len(targets); j++ {
+			if newcollection.data[i] == targets[j] {
+				newcollection.data[i] = replacement
+				targets = append(targets[:j], targets[j+1:]...)
+
+				if len(targets) == 0 {
+					continue Exit
+				}
+
+				break
+			}
+		}
+	}
+
+	return newcollection
+}
+
+func (c *collection[T]) ReplaceAll(targets []T, replacement T) *collection[T] {
+	newcollection := New[T](c.data)
+
+	for i := 0; i < len(newcollection.data); i++ {
+		for j := 0; j < len(targets); j++ {
+			if newcollection.data[i] == targets[j] {
+				newcollection.data[i] = replacement
+
+				break
+			}
+		}
 	}
 
 	return newcollection

@@ -54,6 +54,37 @@ func TestNew(t *testing.T) {
 	}
 }
 
+func TestGenerate(t *testing.T) {
+	i := 0
+	tests := []struct {
+		description string
+		input       int
+		expected    interface{}
+	}{
+		{
+			description: "test generate collection of ints with limit = 7",
+			input:       7,
+			expected:    gofunc.New([]int{1, 2, 3, 4, 5, 6, 7}),
+		},
+		{
+			description: "test generate collection of ints with limit = 0",
+			input:       0,
+			expected:    gofunc.New(make([]int, 0)),
+		},
+		{
+			description: "test generate collection of int with limit = -1",
+			input:       -1,
+			expected:    gofunc.New(make([]int, 0)),
+		},
+	}
+
+	for _, test := range tests {
+		t.Logf("Start: %s\n", test.description)
+		collection := gofunc.Generate(func() int { i++; return i }, test.input)
+		require.Equal(t, test.expected, collection)
+	}
+}
+
 func TestMap(t *testing.T) {
 	tests := []Test[interface{}]{
 		{
@@ -84,6 +115,25 @@ func TestMap(t *testing.T) {
 			require.Equal(t, test.expected, newCollection.ToSlice())
 			require.NotEqual(t, test.expected, collection.ToSlice())
 		}
+	}
+}
+
+func TestFlatMap(t *testing.T) {
+	tests := []Test[interface{}]{
+		{
+			description: "test flat map for collection of ints",
+			input:       []int{1, 2, 3, 4, 5},
+			expected:    []int{1, 1, 2, 2, 3, 3, 4, 4, 5, 5},
+		},
+	}
+
+	for _, test := range tests {
+		t.Logf("Start: %s\n", test.description)
+		slice := test.input.([]int)
+		collection := gofunc.New(slice)
+		newCollection := collection.FlatMap(func(el int) (int, int) { return el, el })
+		require.Equal(t, test.expected, newCollection.ToSlice())
+		require.NotEqual(t, test.expected, collection.ToSlice())
 	}
 }
 
@@ -381,6 +431,48 @@ func TestReverse(t *testing.T) {
 			require.Equal(t, test.expected, newCollection.ToSlice())
 			require.NotEqual(t, test.expected, collection.ToSlice())
 		}
+	}
+}
+
+func TestReplace(t *testing.T) {
+	target := []int{1, 3}
+	replacement := 10
+	tests := []Test[interface{}]{
+		{
+			description: "test replace for collection of ints",
+			input:       []int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5},
+			expected:    []int{10, 2, 10, 4, 5, 1, 2, 3, 4, 5},
+		},
+	}
+
+	for _, test := range tests {
+		t.Logf("Start: %s\n", test.description)
+		slice := test.input.([]int)
+		collection := gofunc.New(slice)
+		newCollection := collection.Replace(target, replacement)
+		require.Equal(t, test.expected, newCollection.ToSlice())
+		require.NotEqual(t, test.expected, collection.ToSlice())
+	}
+}
+
+func TestReplaceAll(t *testing.T) {
+	target := []int{1, 3}
+	replacement := 10
+	tests := []Test[interface{}]{
+		{
+			description: "test replace for collection of ints",
+			input:       []int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5},
+			expected:    []int{10, 2, 10, 4, 5, 10, 2, 10, 4, 5},
+		},
+	}
+
+	for _, test := range tests {
+		t.Logf("Start: %s\n", test.description)
+		slice := test.input.([]int)
+		collection := gofunc.New(slice)
+		newCollection := collection.ReplaceAll(target, replacement)
+		require.Equal(t, test.expected, newCollection.ToSlice())
+		require.NotEqual(t, test.expected, collection.ToSlice())
 	}
 }
 
