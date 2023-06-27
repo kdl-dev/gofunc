@@ -21,6 +21,10 @@ type complex interface {
 }
 
 func New[T, V comparable](slice []T, convertFunc func(el T) V) []V {
+	if slice == nil || convertFunc == nil {
+		return nil
+	}
+
 	newSlice := make([]V, len(slice))
 
 	for i := 0; i < len(slice); i++ {
