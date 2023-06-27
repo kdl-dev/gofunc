@@ -20,6 +20,10 @@ Generates a collection based on the received function.
 The number of elements is given by the second input argument.
 */
 func Generate[T comparable](script func() T, limit int) *collection[T] {
+	if script == nil {
+		return nil
+	}
+
 	if limit <= 0 {
 		return New(make([]T, 0))
 	}
@@ -35,6 +39,10 @@ func Generate[T comparable](script func() T, limit int) *collection[T] {
 
 // Performs an action for each element of this collection.
 func (c *collection[T]) ForEach(consume func(el T)) {
+	if consume == nil {
+		return
+	}
+
 	for _, value := range c.data {
 		consume(value)
 	}
@@ -45,6 +53,10 @@ Returns a collection consisting of the results of applying
 the given function to the elements of this collection.
 */
 func (c *collection[T]) Map(predicate func(el T) T) *collection[T] {
+	if predicate == nil {
+		return New(c.data)
+	}
+
 	newcollection := New[T](c.data)
 
 	for i := 0; i < len(newcollection.data); i++ {
@@ -61,6 +73,10 @@ collection produced by applying the provided mapping function to
 each element.
 */
 func (c *collection[T]) FlatMap(predicate func(el T) (T, T)) *collection[T] {
+	if predicate == nil {
+		return New(c.data)
+	}
+
 	newcollection := New[T](make([]T, len(c.data)*2))
 
 	for i := 0; i < len(newcollection.data)-1; i += 2 {
@@ -78,6 +94,10 @@ accumulation function, and returns the reduced value.
 func (c *collection[T]) Reduce(binaryOperator func(el, accum T) T) T {
 	var accum T
 
+	if c.Len() == 0 || binaryOperator == nil {
+		return accum
+	}
+
 	for _, value := range c.data {
 		accum = binaryOperator(value, accum)
 	}
@@ -90,6 +110,10 @@ Returns a collection consisting of the elements
 of this collection that match the given condition.
 */
 func (c *collection[T]) Filter(filter func(el T) bool) *collection[T] {
+	if filter == nil {
+		return New(c.data)
+	}
+
 	newcollection := New[T](make([]T, 0, len(c.data)))
 
 	for _, value := range c.data {
@@ -106,6 +130,10 @@ Returns whether any elements of this collection
 match the provided condition.
 */
 func (c *collection[T]) Match(predicate func(el T) bool) bool {
+	if c.Len() == 0 || predicate == nil {
+		return false
+	}
+
 	for _, value := range c.data {
 		if predicate(value) {
 			return true
@@ -120,6 +148,10 @@ Returns whether all elements of this collection
 match the provided condition.
 */
 func (c *collection[T]) AllMatch(predicate func(el T) bool) bool {
+	if c.Len() == 0 || predicate == nil {
+		return false
+	}
+
 	for _, value := range c.data {
 		if !predicate(value) {
 			return false
@@ -180,6 +212,10 @@ Returns a collection consisting of the elements
 of this collection, sorted according by input function.
 */
 func (c *collection[T]) Sort(sort func(arr []T)) *collection[T] {
+	if sort == nil {
+		return New(c.data)
+	}
+
 	newcollection := New[T](c.data)
 
 	sort(newcollection.data)
@@ -254,6 +290,10 @@ according to the provided compare function.
 func (c *collection[T]) Max(compare func(firstEl, secondEl T) T) T {
 	var resultMax, currentMax T
 
+	if compare == nil {
+		return resultMax
+	}
+
 	if len(c.data) > 1 {
 		resultMax = compare(c.data[0], c.data[1])
 	}
@@ -272,6 +312,10 @@ according to the provided compare function.
 */
 func (c *collection[T]) Min(compare func(firstEl, secondEl T) T) T {
 	var resultMin, currentMin T
+
+	if compare == nil {
+		return resultMin
+	}
 
 	if len(c.data) > 1 {
 		resultMin = compare(c.data[0], c.data[1])
@@ -304,6 +348,11 @@ Converts a collection to a string.
 */
 func (c *collection[T]) ToString(convert func(el T) string) string {
 	var resultStr string
+
+	if convert == nil {
+		return resultStr
+	}
+
 	for _, value := range c.data {
 		resultStr += convert(value)
 	}

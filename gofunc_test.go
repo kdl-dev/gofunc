@@ -1,644 +1,691 @@
-package gofunc_test
+package gofunc
 
 import (
 	"math"
 	"sort"
 	"strconv"
-	"strings"
 	"testing"
 
-	"github.com/kdl-dev/gofunc"
 	"github.com/stretchr/testify/require"
 )
 
-// ! don't edit
-var (
-	intSlice  = []int{3, 1, 6, 9, -5, 0, 11}
-	strSlice  = []string{"test2", "test1", "test4", "test3"}
-	intSlice2 = []int{3, 1, 6, 9, -5, 0, 11, 1, 1, 5, 9, 14, 3, -5, 0}
-	strSlice2 = []string{"test2", "test1", "test4", "test3", "test2", "test5", "test1"}
-)
-
-type Test[T comparable] struct {
-	description string
-	input       T
-	expected    interface{}
-}
-
 func TestNew(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    []int
+		expected interface{}
+	}{
 		{
-			description: "test init collection of ints",
-			input:       intSlice,
-			expected:    intSlice,
+			name:     "test1",
+			input:    []int{1, 2, 3, 4, 5},
+			expected: []int{1, 2, 3, 4, 5},
 		},
 		{
-			description: "test init collection of strings",
-			input:       strSlice,
-			expected:    strSlice,
+			name:     "test2",
+			input:    []int{},
+			expected: []int{},
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			require.Equal(t, test.expected, collection.ToSlice())
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			require.Equal(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		slice := test.input
+		collection := New(slice)
+		require.Equal(t, test.expected, collection.ToSlice())
 	}
 }
 
 func TestGenerate(t *testing.T) {
-	i := 0
+	var i int
 	tests := []struct {
-		description string
-		input       int
-		expected    interface{}
+		name     string
+		script   func() int
+		limit    int
+		expected interface{}
 	}{
 		{
-			description: "test generate collection of ints with limit = 7",
-			input:       7,
-			expected:    gofunc.New([]int{1, 2, 3, 4, 5, 6, 7}),
+			name:     "test1",
+			script:   func() int { i++; return i },
+			limit:    5,
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 		{
-			description: "test generate collection of ints with limit = 0",
-			input:       0,
-			expected:    gofunc.New(make([]int, 0)),
+			name:     "test2",
+			script:   func() int { i++; return i },
+			limit:    0,
+			expected: New(make([]int, 0)),
 		},
 		{
-			description: "test generate collection of int with limit = -1",
-			input:       -1,
-			expected:    gofunc.New(make([]int, 0)),
+			name:     "test3",
+			script:   func() int { i++; return i },
+			limit:    -1,
+			expected: New(make([]int, 0)),
+		},
+		{
+			name:     "test4",
+			script:   nil,
+			limit:    5,
+			expected: (*collection[int])(nil),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		collection := gofunc.Generate(func() int { i++; return i }, test.input)
+		t.Log(test.name)
+		i = 0
+		collection := Generate[int](test.script, test.limit)
 		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestMap(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int) int
+		expected *collection[int]
+	}{
 		{
-			description: "test map for collection of ints",
-			input:       intSlice,
-			expected:    []int{6, 2, 12, 18, -10, 0, 22},
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(i int) int { return i + 1 },
+			expected: New([]int{2, 3, 4, 5, 6}),
 		},
 		{
-			description: "test map for collection of strings",
-			input:       strSlice,
-			expected:    []string{"TEST2", "TEST1", "TEST4", "TEST3"},
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(i int) int { return i + 1 },
+			expected: New([]int{}),
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			newCollection := collection.Map(func(el int) int { return el * 2 })
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			newCollection := collection.Map(func(el string) string { return strings.ToUpper(el) })
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		collection := test.input.Map(test.script)
+		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestFlatMap(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int) (int, int)
+		expected *collection[int]
+	}{
 		{
-			description: "test flat map for collection of ints",
-			input:       []int{1, 2, 3, 4, 5},
-			expected:    []int{1, 1, 2, 2, 3, 3, 4, 4, 5, 5},
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(i int) (int, int) { return i, i + 1 },
+			expected: New([]int{1, 2, 2, 3, 3, 4, 4, 5, 5, 6}),
+		},
+		{
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(i int) (int, int) { return i, i + 1 },
+			expected: New([]int{}),
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		slice := test.input.([]int)
-		collection := gofunc.New(slice)
-		newCollection := collection.FlatMap(func(el int) (int, int) { return el, el })
-		require.Equal(t, test.expected, newCollection.ToSlice())
-		require.NotEqual(t, test.expected, collection.ToSlice())
+		t.Log(test.name)
+		collection := test.input.FlatMap(test.script)
+		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestReduce(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int, int) int
+		expected int
+	}{
 		{
-			description: "test reduce for collection of ints",
-			input:       intSlice,
-			expected:    25,
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(el, accum int) int { return el + accum },
+			expected: 15,
 		},
 		{
-			description: "test reduce for collection of strings",
-			input:       strSlice,
-			expected:    "test2 test1 test4 test3 ",
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(el, accum int) int { return el + accum },
+			expected: 0,
+		},
+		{
+			name:     "test3",
+			input:    New([]int{}),
+			script:   nil,
+			expected: 0,
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.Reduce(func(el, accum int) int { return accum + el })
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.Reduce(func(el, accum string) string { return accum + el + " " })
-			require.Equal(t, test.expected, result)
-		}
+		t.Log(test.name)
+		result := test.input.Reduce(test.script)
+		require.Equal(t, test.expected, result)
+
 	}
 }
 
 func TestFilter(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int) bool
+		expected *collection[int]
+	}{
 		{
-			description: "test filter for collection of ints",
-			input:       intSlice,
-			expected:    []int{6, 0},
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(i int) bool { return i%2 == 0 },
+			expected: New([]int{2, 4}),
 		},
 		{
-			description: "test filter for collection of strings",
-			input:       strSlice,
-			expected:    []string{"test2", "test4"},
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(i int) bool { return i%2 == 0 },
+			expected: New([]int{}),
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			newCollection := collection.Filter(func(el int) bool { return el%2 == 0 })
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			newCollection := collection.Filter(func(el string) bool { return strings.Contains(el, "2") || strings.Contains(el, "4") })
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		collection := test.input.Filter(test.script)
+		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestMatch(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int) bool
+		expected bool
+	}{
 		{
-			description: "test match for collection of ints",
-			input:       intSlice,
-			expected:    true,
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(i int) bool { return i == 4 },
+			expected: true,
 		},
 		{
-			description: "test match for collection of strings",
-			input:       strSlice,
-			expected:    false,
+			name:     "test2",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(i int) bool { return i == 10 },
+			expected: false,
+		},
+		{
+			name:     "test3",
+			input:    New([]int{}),
+			script:   func(i int) bool { return i == 0 },
+			expected: false,
+		},
+		{
+			name:     "test4",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: false,
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.Match(func(el int) bool { return el < 0 })
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.Match(func(el string) bool { return el == "gofunc" })
-			require.Equal(t, test.expected, result)
-		}
+		t.Log(test.name)
+		result := test.input.Match(test.script)
+		require.Equal(t, test.expected, result)
 	}
 }
 
 func TestAllMatch(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int) bool
+		expected bool
+	}{
 		{
-			description: "test all match for collection of ints",
-			input:       intSlice,
-			expected:    false,
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(i int) bool { return i > 0 },
+			expected: true,
 		},
 		{
-			description: "test all match for collection of strings",
-			input:       strSlice,
-			expected:    true,
+			name:     "test2",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(i int) bool { return i%2 == 0 },
+			expected: false,
+		},
+		{
+			name:     "test3",
+			input:    New([]int{}),
+			script:   func(i int) bool { return i > 0 },
+			expected: false,
+		},
+		{
+			name:     "test4",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: false,
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.AllMatch(func(el int) bool { return el > 0 })
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.AllMatch(func(el string) bool { return strings.Contains(el, "test") })
-			require.Equal(t, test.expected, result)
-		}
+		t.Log(test.name)
+		result := test.input.AllMatch(test.script)
+		require.Equal(t, test.expected, result)
 	}
 }
 
 func TestDistinct(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		expected *collection[int]
+	}{
 		{
-			description: "test distinct for collection of ints",
-			input:       intSlice2,
-			expected:    []int{3, 1, 6, 9, -5, 0, 11, 5, 14},
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 		{
-			description: "test distinct for collection of strings",
-			input:       strSlice2,
-			expected:    []string{"test2", "test1", "test4", "test3", "test5"},
+			name:     "test2",
+			input:    New([]int{}),
+			expected: New([]int{}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			newCollection := collection.Distinct()
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			newCollection := collection.Distinct()
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		result := test.input.Distinct()
+		require.Equal(t, test.expected, result)
 	}
 }
 
 func TestLimit(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		limit    int
+		expected *collection[int]
+	}{
 		{
-			description: "test limit for collection of ints",
-			input:       intSlice,
-			expected:    intSlice[0:3],
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}),
+			limit:    5,
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 		{
-			description: "test limit for collection of strings",
-			input:       strSlice,
-			expected:    strSlice[0:3],
+			name:     "test2",
+			input:    New([]int{}),
+			limit:    5,
+			expected: New([]int{}),
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			limit:    -1,
+			expected: New([]int{}),
+		},
+		{
+			name:     "test4",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			limit:    10,
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			newCollection := collection.Limit(3)
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-
-			collection.Limit(collection.Len() + 10)
-			collection.Limit(-1)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			newCollection := collection.Limit(3)
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		result := test.input.Limit(test.limit)
+		require.Equal(t, test.expected, result)
 	}
 }
 
 func TestSkip(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		skip     int
+		expected *collection[int]
+	}{
 		{
-			description: "test skip for collection of ints",
-			input:       intSlice,
-			expected:    intSlice[3:],
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}),
+			skip:     5,
+			expected: New([]int{6, 7, 8, 9, 10}),
 		},
 		{
-			description: "test skip for collection of strings",
-			input:       strSlice,
-			expected:    strSlice[3:],
+			name:     "test2",
+			input:    New([]int{}),
+			skip:     5,
+			expected: New([]int{}),
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			skip:     -1,
+			expected: New([]int{1, 2, 3, 4, 5}),
+		},
+		{
+			name:     "test4",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			skip:     10,
+			expected: New([]int{}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			newCollection := collection.Skip(3)
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-
-			collection.Skip(collection.Len() + 10)
-			collection.Skip(-1)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			newCollection := collection.Skip(3)
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		result := test.input.Skip(test.skip)
+		require.Equal(t, test.expected, result)
 	}
 }
 
 func TestSort(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func([]int)
+		expected *collection[int]
+	}{
 		{
-			description: "test sort for collection of ints",
-			input:       intSlice,
-			expected:    []int{-5, 0, 1, 3, 6, 9, 11},
+			name:     "test1",
+			input:    New([]int{2, 1, 4, 3, 5}),
+			script:   func(arr []int) { sort.Ints(arr) },
+			expected: New([]int{1, 2, 3, 4, 5}),
 		},
 		{
-			description: "test sort for collection of strings",
-			input:       strSlice,
-			expected:    []string{"test1", "test2", "test3", "test4"},
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(arr []int) { sort.Ints(arr) },
+			expected: New([]int{}),
+		},
+		{
+			name:     "test3",
+			input:    New([]int{2, 1, 4, 3, 5}),
+			script:   nil,
+			expected: New([]int{2, 1, 4, 3, 5}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			newCollection := collection.Sort(func(arr []int) { sort.Ints(arr) })
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			newCollection := collection.Sort(func(arr []string) { sort.Strings(arr) })
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		collection := test.input.Sort(test.script)
+		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestReverse(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		expected *collection[int]
+	}{
 		{
-			description: "test reverse for collection of ints",
-			input:       intSlice,
-			expected:    []int{11, 0, -5, 9, 6, 1, 3},
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			expected: New([]int{5, 4, 3, 2, 1}),
 		},
 		{
-			description: "test reverse for collection of strings",
-			input:       strSlice,
-			expected:    []string{"test3", "test4", "test1", "test2"},
+			name:     "test2",
+			input:    New([]int{}),
+			expected: New([]int{}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			newCollection := collection.Reverse()
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			newCollection := collection.Reverse()
-			require.Equal(t, test.expected, newCollection.ToSlice())
-			require.NotEqual(t, test.expected, collection.ToSlice())
-		}
+		t.Log(test.name)
+		collection := test.input.Reverse()
+		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestReplace(t *testing.T) {
-	target := []int{1, 3}
-	replacement := 10
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name        string
+		input       *collection[int]
+		targets     []int
+		replacement int
+		expected    *collection[int]
+	}{
 		{
-			description: "test replace for collection of ints",
-			input:       []int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5},
-			expected:    []int{10, 2, 10, 4, 5, 1, 2, 3, 4, 5},
+			name:        "test1",
+			input:       New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+			targets:     []int{1, 2, 3},
+			replacement: 10,
+			expected:    New([]int{10, 10, 10, 4, 5, 1, 2, 3, 4, 5}),
+		},
+		{
+			name:        "test2",
+			input:       New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+			targets:     []int{7, 8, 9},
+			replacement: 10,
+			expected:    New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+		},
+		{
+			name:        "test3",
+			input:       New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+			targets:     nil,
+			replacement: 10,
+			expected:    New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		slice := test.input.([]int)
-		collection := gofunc.New(slice)
-		newCollection := collection.Replace(target, replacement)
-		require.Equal(t, test.expected, newCollection.ToSlice())
-		require.NotEqual(t, test.expected, collection.ToSlice())
+		t.Log(test.name)
+		collection := test.input.Replace(test.targets, test.replacement)
+		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestReplaceAll(t *testing.T) {
-	target := []int{1, 3}
-	replacement := 10
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name        string
+		input       *collection[int]
+		targets     []int
+		replacement int
+		expected    *collection[int]
+	}{
 		{
-			description: "test replace for collection of ints",
-			input:       []int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5},
-			expected:    []int{10, 2, 10, 4, 5, 10, 2, 10, 4, 5},
+			name:        "test1",
+			input:       New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+			targets:     []int{1, 2, 3},
+			replacement: 10,
+			expected:    New([]int{10, 10, 10, 4, 5, 10, 10, 10, 4, 5}),
+		},
+		{
+			name:        "test2",
+			input:       New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+			targets:     []int{7, 8, 9},
+			replacement: 10,
+			expected:    New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+		},
+		{
+			name:        "test3",
+			input:       New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
+			targets:     nil,
+			replacement: 10,
+			expected:    New([]int{1, 2, 3, 4, 5, 1, 2, 3, 4, 5}),
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		slice := test.input.([]int)
-		collection := gofunc.New(slice)
-		newCollection := collection.ReplaceAll(target, replacement)
-		require.Equal(t, test.expected, newCollection.ToSlice())
-		require.NotEqual(t, test.expected, collection.ToSlice())
+		t.Log(test.name)
+		collection := test.input.ReplaceAll(test.targets, test.replacement)
+		require.Equal(t, test.expected, collection)
 	}
 }
 
 func TestMax(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int, int) int
+		expected int
+	}{
 		{
-			description: "test max for collection of ints",
-			input:       intSlice,
-			expected:    11,
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(el1, el2 int) int { return int(math.Max(float64(el1), float64(el2))) },
+			expected: 5,
 		},
 		{
-			description: "test max for collection of strings",
-			input:       strSlice,
-			expected:    "test4",
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(el1, el2 int) int { return int(math.Max(float64(el1), float64(el2))) },
+			expected: 0,
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: 0,
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.Max(func(firstEl, secondEl int) int { return int(math.Max(float64(firstEl), float64(secondEl))) })
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.Max(func(firstEl, secondEl string) string {
-				if firstEl > secondEl {
-					return firstEl
-				}
-				return secondEl
+		t.Log(test.name)
+		result := test.input.Max(test.script)
+		require.Equal(t, test.expected, result)
 
-			})
-			require.Equal(t, test.expected, result)
-		}
 	}
 }
 
 func TestMin(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int, int) int
+		expected int
+	}{
 		{
-			description: "test min for collection of ints",
-			input:       intSlice,
-			expected:    -5,
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(el1, el2 int) int { return int(math.Min(float64(el1), float64(el2))) },
+			expected: 1,
 		},
 		{
-			description: "test min for collection of strings",
-			input:       strSlice,
-			expected:    "test1",
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(el1, el2 int) int { return int(math.Min(float64(el1), float64(el2))) },
+			expected: 0,
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: 0,
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.Min(func(firstEl, secondEl int) int { return int(math.Min(float64(firstEl), float64(secondEl))) })
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.Min(func(firstEl, secondEl string) string {
-				if firstEl < secondEl {
-					return firstEl
-				}
-				return secondEl
+		t.Log(test.name)
+		result := test.input.Min(test.script)
+		require.Equal(t, test.expected, result)
 
-			})
-			require.Equal(t, test.expected, result)
-		}
 	}
 }
 
 func TestLen(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		expected int
+	}{
 		{
-			description: "test len for collection of ints",
-			input:       intSlice,
-			expected:    7,
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			expected: 5,
 		},
 		{
-			description: "test len for collection of strings",
-			input:       strSlice,
-			expected:    4,
+			name:     "test2",
+			input:    New([]int{}),
+			expected: 0,
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.Len()
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.Len()
-			require.Equal(t, test.expected, result)
-		}
+		t.Log(test.name)
+		result := test.input.Len()
+		require.Equal(t, test.expected, result)
+
 	}
 }
 
 func TestToSlice(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		expected []int
+	}{
 		{
-			description: "test conversion to slice of ints for collection of ints",
-			input:       intSlice,
-			expected:    intSlice,
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			expected: []int{1, 2, 3, 4, 5},
 		},
 		{
-			description: "test conversion to slice of strings for collection of strings",
-			input:       strSlice,
-			expected:    strSlice,
+			name:     "test2",
+			input:    New([]int{}),
+			expected: []int{},
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.ToSlice()
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.ToSlice()
-			require.Equal(t, test.expected, result)
-		}
+		t.Log(test.name)
+		slice := test.input.ToSlice()
+		require.Equal(t, test.expected, slice)
 	}
 }
 
 func TestToString(t *testing.T) {
-	tests := []Test[interface{}]{
+	tests := []struct {
+		name     string
+		input    *collection[int]
+		script   func(int) string
+		expected string
+	}{
 		{
-			description: "test conversion to string for collection of ints",
-			input:       intSlice,
-			expected:    "3 1 6 9 -5 0 11 ",
+			name:     "test1",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   func(el int) string { return strconv.Itoa(el) + ", " },
+			expected: "1, 2, 3, 4, 5, ",
 		},
 		{
-			description: "test conversion to string for collection of strings",
-			input:       strSlice,
-			expected:    "test2 test1 test4 test3 ",
+			name:     "test2",
+			input:    New([]int{}),
+			script:   func(el int) string { return strconv.Itoa(el) + ", " },
+			expected: "",
+		},
+		{
+			name:     "test3",
+			input:    New([]int{1, 2, 3, 4, 5}),
+			script:   nil,
+			expected: "",
 		},
 	}
 
 	for _, test := range tests {
-		t.Logf("Start: %s\n", test.description)
-		switch test.input.(type) {
-		case []int:
-			slice := test.input.([]int)
-			collection := gofunc.New(slice)
-			result := collection.ToString(func(el int) string { return strconv.Itoa(el) + " " })
-			require.Equal(t, test.expected, result)
-		case []string:
-			slice := test.input.([]string)
-			collection := gofunc.New(slice)
-			result := collection.ToString(func(el string) string { return el + " " })
-			require.Equal(t, test.expected, result)
-		}
+		t.Log(test.name)
+		result := test.input.ToString(test.script)
+		require.Equal(t, test.expected, result)
+
 	}
 }
